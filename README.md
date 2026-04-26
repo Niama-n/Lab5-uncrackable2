@@ -1,6 +1,6 @@
 ## LAB 5 : Reverse Engineering de UnCrackable Level 2
 
-## Objectif du Lab
+## Objectifs pédagogiques
 
 Dans ce laboratoire, l’objectif est d’apprendre à analyser une application Android qui cache sa logique importante dans une bibliothèque native. L’application semble simple : un champ de texte permet de saisir une valeur, puis un bouton déclenche une vérification. Pourtant, cette vérification n’est pas entièrement visible dans le code Java. Le write-up analysé montre que la chaîne saisie dans l’interface est transmise depuis MainActivity à un objet CodeCheck, qui charge une bibliothèque native via System.loadLibrary("foo") puis appelle une méthode JNI nommée bar. Cette fonction native effectue ensuite une comparaison de chaînes avec strncmp, ce qui mène à la récupération du secret.
 
@@ -36,7 +36,7 @@ Retrouver le secret final et le valider dans l’application
 
 La première étape de toute analyse APK commence par l'examen du fichier `AndroidManifest.xml`. Il constitue la carte d'identité de l'application.
 
-![AndroidManifest.xml dans JADX](test/screen1.png)
+![screen1.png](test/screen1.png)
 
 **Informations clés extraites :**
 
@@ -52,7 +52,7 @@ La première étape de toute analyse APK commence par l'examen du fichier `Andro
 
 L'analyse de `MainActivity` avec JADX révèle la logique d'interface utilisateur et le mécanisme de validation de haut niveau.
 
-![Code Java de la méthode verify()](test/screen2.png)
+![screen2.png](test/screen2.png)
 
 ### Méthode `verify(View view)`
 
@@ -79,7 +79,7 @@ C'est ici que l'analyse Java atteint ses limites : impossible de voir la logique
 
 ## Étape 3 — Identification du Chargement Natif (`libfoo.so`)
 
-![Bloc statique et chargement de libfoo.so](test/screen3.png)
+![screen3.png](test/screen3.png)
 
 Dans la classe `MainActivity`, un bloc statique est présent :
 
@@ -103,7 +103,7 @@ L'utilisation de code natif est une technique courante d'obfuscation dans les ap
 
 C'est l'étape centrale de ce lab. Après avoir extrait `libfoo.so` de l'APK (via un simple renommage en `.zip` puis extraction du dossier `lib/`), le fichier est ouvert dans IDA Pro.
 
-![Pseudocode de libfoo.so dans IDA Pro](test/screen4.png)
+![screen4.png](test/screen4.png)
 
 ### Pseudocode C généré par IDA Pro
 
@@ -141,7 +141,7 @@ Le secret extrait de la bibliothèque native est :
 Thanks for all the fish
 ```
 
-![Résultat de validation dans l'application](test/screen5.png)
+![screen5.png](test/screen5.png)
 
 En saisissant cette chaîne dans le champ de l'application :
 
@@ -164,3 +164,7 @@ Ce second niveau d'UnCrackable introduit une difficulté supplémentaire par rap
 - Les mécanismes anti-debug (`byte_400C`) doivent être pris en compte lors d'une analyse dynamique.
 
 > **Secret final :** `Thanks for all the fish`
+
+
+## Realise par 
+NAFTAOUI NIAMA
